@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import Swal from 'sweetalert2';
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -158,21 +159,45 @@ const LoginForm = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    console.log('Google login clicked');
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const idToken = credentialResponse?.credential;
+      if (!idToken) throw new Error('No credential received from Google');
+
+      const response = await api.post('/lostAndFound/auth/google', { idToken });
+
+      // Expecting { token, email, username, message }
+      const userData = {
+        name: response.data.username || response.data.email?.split('@')[0],
+        email: response.data.email,
+      };
+      login(userData, response.data.token);
+      Swal.fire({
+        icon: 'success',
+        title: 'Logged in with Google',
+        timer: 1000,
+        showConfirmButton: false,
+        background: '#1e213a',
+      }).then(() => navigate('/home'));
+    } catch (err) {
+      console.error('Google auth failed', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Google Login Failed',
+        text: 'Could not sign in with Google. Please try again.',
+        confirmButtonColor: '#ef4444',
+        background: '#1e213a',
+      });
+    }
+  };
+
+  const handleGoogleError = () => {
     Swal.fire({
-      icon: 'info',
-      title: 'Google Login',
-      text: 'Redirecting to Google login...',
-      confirmButtonColor: '#8b5cf6',
+      icon: 'error',
+      title: 'Google Login Cancelled',
+      text: 'Please try again.',
+      confirmButtonColor: '#ef4444',
       background: '#1e213a',
-      backdrop: 'rgba(0,0,0,0.4)',
-      customClass: {
-        popup: 'rounded-xl shadow-2xl',
-        title: 'text-white font-bold',
-        htmlContainer: 'text-gray-300',
-        confirmButton: 'rounded-lg px-6 py-2 font-medium'
-      }
     });
   };
 
@@ -452,13 +477,20 @@ const LoginForm = () => {
                 transition={{ duration: 0.5, delay: 1.0 }}
                 className="mt-6"
               >
-            <button
-              onClick={handleGoogleLogin}
-                  className="w-full inline-flex justify-center items-center gap-2 py-3 px-4 border border-slate-600 rounded-lg shadow-sm bg-slate-800/60 backdrop-blur-sm text-sm font-medium text-slate-300 hover:bg-slate-700/60 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-300"
-            >
-                  <FcGoogle className="h-5 w-5" />
-              Sign in with Google
-            </button>
+                <div className="w-full">
+                  <div className="transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg rounded-lg">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleError}
+                      shape="pill"
+                      text="continue_with"
+                      theme="outline"
+                      size="large"
+                      logo_alignment="left"
+                      width="100%"
+                    />
+                  </div>
+                </div>
               </motion.div>
 
               {/* Sign Up Link */}

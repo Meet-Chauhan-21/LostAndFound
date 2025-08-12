@@ -31,7 +31,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/lostAndFound/user-register", "/lostAndFound/user-login", "/lostAndFound/admin-login").permitAll()
+                .requestMatchers("/lostAndFound/user-register", "/lostAndFound/user-login", "/lostAndFound/admin-login", "/lostAndFound/auth/google").permitAll()
                 .requestMatchers("/lostAndFound/search", "/lostAndFound/detail/**").permitAll()
                 .requestMatchers("/lostAndFound/home", "/lostAndFound/HowItWorksPage", "/lostAndFound/ServicesPage", "/lostAndFound/ContactPage").permitAll()
                 .requestMatchers("/user-reports/**").permitAll()
@@ -53,4 +53,4 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
-} 
+}

@@ -1,5 +1,9 @@
 package com.laf.LostAndFound.controller;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.laf.LostAndFound.dto.AuthResponse;
 import com.laf.LostAndFound.dto.LoginRequest;
 import com.laf.LostAndFound.entity.User;
@@ -17,6 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +147,62 @@ public class UserController {
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userRepository.findAll();
         return ResponseEntity.ok(users);
+    }
+
+    // Google OAuth: verify ID token, create/find user, issue JWT
+    @PostMapping("/auth/google")
+    public ResponseEntity<?> googleAuth(@RequestBody Map<String, String> body) {
+        try {
+            String idTokenString = body.get("idToken");
+            if (idTokenString == null || idTokenString.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Missing idToken"));
+            }
+
+            // Verify Google ID token
+            var httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+            var jsonFactory = JacksonFactory.getDefaultInstance();
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(httpTransport, jsonFactory)
+                    .setAudience(Collections.singletonList(
+                            "21822425516-ok3rneq3tf74m1imo7v1gi527h1fajlv.apps.googleusercontent.com"))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid Google ID token"));
+            }
+
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+
+            // Find or create user
+            Optional<User> existing = userRepository.findByEmail(email);
+            User user;
+            if (existing.isPresent()) {
+                user = existing.get();
+                if (user.getUsername() == null && name != null) user.setUsername(name);
+            } else {
+                user = new User();
+                user.setEmail(email);
+                user.setUsername(name != null ? name : email.split("@")[0]);
+                user.setPassword(passwordEncoder.encode("google-oauth"));
+                user = userRepository.save(user);
+            }
+
+            String token = jwtUtil.generateToken(email);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login successfully");
+            response.put("token", token);
+            response.put("email", email);
+            response.put("username", user.getUsername());
+            return ResponseEntity.ok(response);
+        } catch (GeneralSecurityException ge) {
+            ge.printStackTrace();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token verification failed"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Google auth failed"));
+        }
     }
 
     @PostMapping("/admin-login")
