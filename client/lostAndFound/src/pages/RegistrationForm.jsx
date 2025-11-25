@@ -565,23 +565,28 @@ const RegistrationForm = () => {
                 transition={{ duration: 0.5, delay: 1.2 }}
                 className="mt-6"
               >
-                <div className="w-full">
+                <div className="w-full" style={{ display: 'flex', justifyContent: 'center' }}>
                   <div 
                     className="w-full bg-white/10 hover:bg-white/15 backdrop-blur-sm border border-slate-600/50 rounded-full transition-all duration-300 hover:shadow-xl hover:border-purple-500/30 hover:scale-[1.02]"
                     style={{ 
-                      padding: '2px'
+                      padding: '2px',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}
                   >
-                    <GoogleLogin
-                      onSuccess={handleGoogleSuccess}
-                      onError={handleGoogleError}
-                      shape="pill"
-                      text="continue_with"
-                      theme="filled_black"
-                      size="large"
-                      logo_alignment="left"
-                      width="100%"
-                    />
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                      <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={handleGoogleError}
+                        shape="pill"
+                        text="continue_with"
+                        theme="filled_black"
+                        size="large"
+                        logo_alignment="left"
+                      />
+                    </div>
                   </div>
                 </div>
               </motion.div>
