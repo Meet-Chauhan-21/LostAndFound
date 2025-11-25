@@ -33,14 +33,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configure(http))
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/lostAndFound/user-register", "/lostAndFound/user-login", "/lostAndFound/admin-login", "/lostAndFound/auth/google").permitAll()
                 .requestMatchers("/lostAndFound/search", "/lostAndFound/detail/**").permitAll()
                 .requestMatchers("/lostAndFound/home", "/lostAndFound/HowItWorksPage", "/lostAndFound/ServicesPage", "/lostAndFound/ContactPage").permitAll()
                 .requestMatchers("/user-reports/**").permitAll()
                 .requestMatchers("/lostAndFound/getUser/**", "/lostAndFound/user-get/**", "/lostAndFound/user-history/**", "/lostAndFound/getAllUsers").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/lostAndFound/**").permitAll()
+                .anyRequest().permitAll()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -61,10 +62,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // In production, replace with your frontend URL
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // Allow all origins
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(false);
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
