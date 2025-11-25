@@ -266,7 +266,7 @@ const RegistrationForm = () => {
       <Navbar />
       
       {/* Registration Section */}
-      <section className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <section className="relative min-h-screen flex items-center justify-center pt-20 pb-12 md:py-12 px-4 sm:px-6 lg:px-8">
         <div className="relative z-10 w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Header Text */}
           <motion.div

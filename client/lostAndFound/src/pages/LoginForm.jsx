@@ -239,7 +239,7 @@ const LoginForm = () => {
       <Navbar />
       
       {/* Login Section */}
-      <section className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <section className="relative min-h-screen flex items-center justify-center pt-20 pb-12 md:py-12 px-4 sm:px-6 lg:px-8">
         <div className="relative z-10 w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Header Text */}
           <motion.div
@@ -477,14 +477,17 @@ const LoginForm = () => {
                 transition={{ duration: 0.5, delay: 1.0 }}
                 className="mt-6"
               >
-                <div className="w-full">
-                  <div className="transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg rounded-lg">
+                <div className="w-full flex justify-center">
+                  <div 
+                    className="w-full bg-white/10 hover:bg-white/15 backdrop-blur-sm border border-slate-600/50 rounded-full p-1 transition-all duration-300 hover:shadow-xl hover:border-purple-500/30 hover:scale-[1.02]"
+                    style={{ minWidth: '100%' }}
+                  >
                     <GoogleLogin
                       onSuccess={handleGoogleSuccess}
                       onError={handleGoogleError}
                       shape="pill"
                       text="continue_with"
-                      theme="outline"
+                      theme="filled_black"
                       size="large"
                       logo_alignment="left"
                       width="100%"
