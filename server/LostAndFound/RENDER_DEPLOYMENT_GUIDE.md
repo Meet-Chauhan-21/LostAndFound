@@ -96,10 +96,10 @@ Fill in these settings:
 | **Name** | `lostandfound-backend` |
 | **Region** | Choose closest to you (e.g., Oregon, Singapore) |
 | **Branch** | `main` |
-| **Root Directory** | Leave blank (or `server/LostAndFound` if in monorepo) |
-| **Runtime** | **Java** (Auto-detected) |
-| **Build Command** | `mvn clean package -DskipTests` |
-| **Start Command** | `java -jar target/LostAndFound-0.0.1-SNAPSHOT.jar` |
+| **Root Directory** | `server/LostAndFound` ⚠️ **IMPORTANT** |
+| **Environment** | **Docker** |
+| **Dockerfile Path** | `Dockerfile` (or leave blank, it will auto-detect) |
+| **Docker Build Context Directory** | `.` |
 | **Instance Type** | **Free** |
 
 Click **Advanced** to expand more options (we'll add environment variables next).

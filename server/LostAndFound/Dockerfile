@@ -20,11 +20,14 @@ FROM eclipse-temurin:17-jre-jammy
 # Set working directory
 WORKDIR /app
 
+# Install CA certificates for SSL/TLS (needed for MongoDB Atlas)
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
 # Copy the built JAR from build stage
 COPY --from=build /app/target/LostAndFound-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose port
 EXPOSE 10000
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with additional Java options for better MongoDB SSL support
+ENTRYPOINT ["java", "-Djavax.net.ssl.trustStoreType=pkcs12", "-jar", "app.jar"]
