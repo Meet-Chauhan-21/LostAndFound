@@ -3,7 +3,7 @@ import { Search, Package, Smartphone, Mail, CheckCircle, Volume2, VolumeX, Play,
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useEffect, useRef, useState } from "react";
-import video from '../assets/mataji.mp4'
+import video from '../assets/HowItsWork.mp4'
 
 const HowItWorksPage = () => {
   const videoRef = useRef(null);
